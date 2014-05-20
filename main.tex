@@ -1,0 +1,974 @@
+\documentclass{movep}
+
+\usepackage{hyperref}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath}  % Maths
+\usepackage{amsfonts} % Maths
+\usepackage{amssymb}  % Maths
+\usepackage{stmaryrd} % Maths (crochets doubles)
+
+\usepackage{enumerate} % Personnalisation de la numérotation des listes
+\usepackage{url}     % Mise en forme + liens pour URLs
+\usepackage{array}   % Tableaux évolués
+\usepackage{comment}
+
+\usepackage{prettyref}
+\newrefformat{def}{Definition~\ref{#1}}
+\newrefformat{fig}{Figure~\ref{#1}}
+\newrefformat{pro}{Property~\ref{#1}}
+\newrefformat{pps}{Proposition~\ref{#1}}
+\newrefformat{lem}{Lemma~\ref{#1}}
+\newrefformat{th}{Theorem~\ref{#1}}
+\newrefformat{sec}{Section~\ref{#1}}
+%\newrefformat{ssec}{Subsect.~\ref{#1}}
+\newrefformat{suppl}{Appendix~\ref{#1}}
+\newrefformat{eq}{Eq.~\eqref{#1}}
+\def\pref{\prettyref}
+
+%\spnewtheorem*{example*}{Example}{\itshape}{}
+\newtheorem*{example*}{Example}{\itshape}{}
+
+\usepackage{tikz}
+\newdimen\pgfex
+\newdimen\pgfem
+\usetikzlibrary{arrows,shapes,shadows,scopes}
+\usetikzlibrary{positioning}
+\usetikzlibrary{matrix}
+\usetikzlibrary{decorations.text}
+\usetikzlibrary{decorations.pathmorphing}
+
+%\input{macros/macros}
+
+% Macros générales
+\def\Pint{\textsc{PINT}}
+
+% Notations générales pour PH
+\newcommand{\PH}{\mathcal{PH}}
+\newcommand{\PHs}{\Sigma}
+\newcommand{\PHl}{L}
+\newcommand{\PHp}{\textcolor{red}{\mathcal{P}}}
+\newcommand{\PHproc}{\mathbf{Proc}}
+\newcommand{\Proc}{\mathbf{Proc}}
+\newcommand{\PHa}{\PHh}
+\newcommand{\PHh}{\mathcal{H}}
+\newcommand{\PHn}{\mathcal{N}}
+\newcommand{\powerset}{\wp}
+
+\newcommand{\PHhitter}{\mathsf{hitter}}
+\newcommand{\PHtarget}{\mathsf{target}}
+\newcommand{\PHbounce}{\mathsf{bounce}}
+\newcommand{\PHsort}{\Sigma}
+
+\def\f#1{\mathsf{#1}}
+\def\focals{\f{focals}}
+\def\play{\cdot}
+\def\configs#1{\mathbb C_{#1\rightarrow a}}
+\newcommand{\card}[1]{{|#1|}}
+
+\newcommand{\PHfrappeA}{\rightarrow}
+\newcommand{\PHfrappeB}{\Rsh}
+\newcommand{\PHfrappe}[3]{#1\PHfrappeA#2\PHfrappeB#3}
+\newcommand{\PHfrappebond}[2]{#1\PHfrappeB#2}
+\newcommand{\PHobjectif}[2]{\mbox{$#1\PHfrappeB^*\!#2$}}
+\newcommand{\PHobj}{\PHobjectif}
+\newcommand{\obj}{\PHobjectif}
+\newcommand{\PHobjp}[3]{\PHobj{{#1}_{#2}}{{#1}_{#3}}}
+\newcommand{\PHconcat}{::}
+\newcommand{\PHneutralise}{\rtimes}
+\def\Sce{\mathbf{Sce}}
+\def\OS{\mathbf{OS}}
+\def\Obj{\mathbf{Obj}}
+\newcommand{\components}{\Gamma}
+\newcommand{\cs}{\Delta}
+\def\ctx{\varsigma}
+\def\Ctx{\mathbf{Ctx}}
+\def\ceil{\f{end}}
+\newcommand{\Sol}{\mathbf{Sol}}
+\newcommand{\abstr}[1]{#1^\wedge}%\text{\textasciicircum}}
+\def\BS{\mathbf{BS}}
+\def\aBS{\abstr{\BS}}
+\def\abeta{\abstr{\beta}}
+\def\aZ{\abstr{\zeta}}
+\def\aY{\abstr{\xi}}
+\def\indexes#1{\mathbb{I}^{#1}}
+\def\emptyseq{\varepsilon}
+\def\mconcr{\gamma}
+\def\concr{\mconcr_\ctx}
+\newcommand{\w}{\omega}
+\def\muconcr{\ell}
+\def\uconcr{\muconcr_\ctx}
+
+\newcommand{\Pcai}{P(\ctx, a_i)}
+
+\def\PHget#1#2{{#1[#2]}}
+\newcommand{\PHchange}[2]{(#1 \Lleftarrow #2)}
+\newcommand{\PHarcn}[2]{\mbox{$#1\PHneutralise#2$}}
+\newcommand{\PHjoue}{\cdot}
+\newcommand{\PHplay}{\PHjoue}
+
+\newcommand{\PHetat}[1]{\mbox{$\langle #1 \rangle$}}
+
+% Notations spécifiques à ce papier
+\newcommand{\PHdirectpredec}[1]{\PHs^{-1}(#1)}
+\newcommand{\PHpredec}[1]{\f{pred}(#1)}
+\newcommand{\PHpredecgene}[1]{\f{reg}({#1})}
+\newcommand{\PHpredeccs}[1]{\PHpredec{#1} \setminus \Gamma}
+
+\newcommand{\PHincl}[2]{#1 :: #2}
+
+\def\ctx{\varsigma}
+\def\ctxOverride{\Cap}
+\def\PHstate#1{\langle #1 \rangle}
+
+\def\DEF{\stackrel{\Delta}=}
+\def\EQDEF{\stackrel{\Delta}\Leftrightarrow}
+
+\def\intervalless{<_{[]}}
+
+%\input{macros/macros-ph}
+
+% Notations pour le modèle de Thomas (depuis thèse)
+\newcommand{\GRN}{\mathcal{GRN}}
+\newcommand{\IG}{\mathcal{G}}
+\newcommand{\GRNreg}[1]{\Gamma^{-1}(#1)}
+\newcommand{\GRNres}[2]{\mathsf{Res}_{#1}(#2)}
+\newcommand{\GRNallres}[1]{\mathsf{Res}_{#1}}
+\newcommand{\GRNget}[2]{\PHget{#1}{#2}}
+\newcommand{\GRNetat}[1]{\PHetat{#1}}
+
+\def\levels{\mathsf{levels}}
+\def\levelsA#1#2{\levels_+(#1\rightarrow #2)}
+\def\levelsI#1#2{\levels_-(#1\rightarrow #2)}
+
+\newcommand{\Kinconnu}{\emptyset}
+\newcommand{\RRGva}[3]{#1 \stackrel{#2}{\longrightarrow} #3}
+\newcommand{\RRGgi}{\mathcal{G}}
+\newcommand{\RRGreg}[1]{\RRGgi_{#1}}
+
+\tikzstyle{grn}=[every node/.style={circle,draw=black,outer sep=2pt,minimum
+                size=15pt,text=black}, node distance=1.5cm]
+\tikzstyle{act}=[->,draw=black,thick,color=black]
+\tikzstyle{inh}=[>=|,-|,draw=black,thick, text=black,label]
+\tikzstyle{inf}=[->,draw=colorinf,thick,color=colorinf]
+\tikzstyle{elabel}=[fill=none,text=black, above=-2pt,%sloped,
+minimum size=10pt, outer sep=0, font=\scriptsize, draw=none]
+\tikzstyle{sg}=[every node/.style={outer sep=2pt,minimum
+                size=15pt,text=black}, node distance=2cm]
+
+%\input{macros/macros-grn}
+
+\usepackage{ifthen}
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes}
+
+\definecolor{lightgray}{rgb}{0.8,0.8,0.8}
+\definecolor{lightgrey}{rgb}{0.8,0.8,0.8}
+
+\tikzstyle{boxed ph}=[]
+\tikzstyle{sort}=[fill=lightgray,rounded corners]
+\tikzstyle{process}=[circle,draw,minimum size=15pt,fill=white,
+font=\footnotesize,inner sep=1pt]
+\tikzstyle{black process}=[process, fill=black,text=white, font=\bfseries]
+\tikzstyle{gray process}=[process, draw=black, fill=lightgray]
+\tikzstyle{current process}=[process, draw=black, fill=lightgray]
+\tikzstyle{process box}=[white,draw=black,rounded corners]
+\tikzstyle{tick label}=[font=\footnotesize]
+\tikzstyle{tick}=[black,-]%,densely dotted]
+\tikzstyle{hit}=[->,>=angle 45]
+\tikzstyle{selfhit}=[min distance=30pt,curve to]
+\tikzstyle{bounce}=[densely dotted,->,>=latex]
+\tikzstyle{hl}=[font=\bfseries,very thick]
+\tikzstyle{hl2}=[hl]
+\tikzstyle{nohl}=[font=\normalfont,thin]
+
+\newcommand{\currentScope}{}
+\newcommand{\currentSort}{}
+\newcommand{\currentSortLabel}{}
+\newcommand{\currentAlign}{}
+\newcommand{\currentSize}{}
+
+\newcounter{la}
+\newcommand{\TSetSortLabel}[2]{
+  \expandafter\repcommand\expandafter{\csname TUserSort@#1\endcsname}{#2}
+}
+\newcommand{\TSort}[4]{
+  \renewcommand{\currentScope}{#1}
+  \renewcommand{\currentSort}{#2}
+  \renewcommand{\currentSize}{#3}
+  \renewcommand{\currentAlign}{#4}
+  \ifcsname TUserSort@\currentSort\endcsname
+    \renewcommand{\currentSortLabel}{\csname TUserSort@\currentSort\endcsname}
+  \else
+    \renewcommand{\currentSortLabel}{\currentSort}
+  \fi
+  \begin{scope}[shift={\currentScope}]
+  \ifthenelse{\equal{\currentAlign}{l}}{
+    \filldraw[process box] (-0.5,-0.5) rectangle (0.5,\currentSize-0.5);
+    \node[sort] at (-0.2,\currentSize-0.4) {\currentSortLabel};
+   }{\ifthenelse{\equal{\currentAlign}{r}}{
+     \filldraw[process box] (-0.5,-0.5) rectangle (0.5,\currentSize-0.5);
+     \node[sort] at (0.2,\currentSize-0.4) {\currentSortLabel};
+   }{
+    \filldraw[process box] (-0.5,-0.5) rectangle (\currentSize-0.5,0.5);
+    \ifthenelse{\equal{\currentAlign}{t}}{
+      \node[sort,anchor=east] at (-0.3,0.2) {\currentSortLabel};
+    }{
+      \node[sort] at (-0.6,-0.2) {\currentSortLabel};
+    }
+   }}
+  \setcounter{la}{\currentSize}
+  \addtocounter{la}{-1}
+  \foreach \i in {0,...,\value{la}} {
+    \TProc{\i}
+  }
+  \end{scope}
+}
+
+\newcommand{\TTickProc}[2]{ % pos, label
+  \ifthenelse{\equal{\currentAlign}{l}}{
+    \draw[tick] (-0.6,#1) -- (-0.4,#1);
+    \node[tick label, anchor=east] at (-0.55,#1) {#2};
+   }{\ifthenelse{\equal{\currentAlign}{r}}{
+    \draw[tick] (0.6,#1) -- (0.4,#1);
+    \node[tick label, anchor=west] at (0.55,#1) {#2};
+   }{
+    \ifthenelse{\equal{\currentAlign}{t}}{
+      \draw[tick] (#1,0.6) -- (#1,0.4);
+      \node[tick label, anchor=south] at (#1,0.55) {#2};
+    }{
+      \draw[tick] (#1,-0.6) -- (#1,-0.4);
+      \node[tick label, anchor=north] at (#1,-0.55) {#2};
+    }
+   }}
+}
+\newcommand{\TSetTick}[3]{
+  \expandafter\repcommand\expandafter{\csname TUserTick@#1_#2\endcsname}{#3}
+}
+
+\newcommand{\myProc}[3]{
+  \ifcsname TUserTick@\currentSort_#1\endcsname
+    \TTickProc{#1}{\csname TUserTick@\currentSort_#1\endcsname}
+  \else
+    \TTickProc{#1}{#1}
+  \fi
+  \ifthenelse{\equal{\currentAlign}{l}\or\equal{\currentAlign}{r}}{
+    \node[#2] (\currentSort_#1) at (0,#1) {#3};
+  }{
+    \node[#2] (\currentSort_#1) at (#1,0) {#3};
+  }
+}
+\newcommand{\TSetProcStyle}[2]{
+  \expandafter\repcommand\expandafter{\csname TUserProcStyle@#1\endcsname}{#2}
+}
+\newcommand{\TProc}[1]{
+  \ifcsname TUserProcStyle@\currentSort_#1\endcsname
+    \myProc{#1}{\csname TUserProcStyle@\currentSort_#1\endcsname}{}
+  \else
+    \myProc{#1}{process}{}
+  \fi
+}
+
+\newcommand{\repcommand}[2]{
+  \providecommand{#1}{#2}
+  \renewcommand{#1}{#2}
+}
+\newcommand{\THit}[5]{
+  \path[hit] (#1) edge[#2] (#3#4);
+  \expandafter\repcommand\expandafter{\csname TBounce@#3@#5\endcsname}{#4}
+}
+\newcommand{\TBounce}[4]{
+  (#1\csname TBounce@#1@#3\endcsname) edge[#2] (#3#4)
+}
+
+\newcommand{\TState}[1]{
+  \foreach \proc in {#1} {
+    \node[current process] (\proc) at (\proc.center) {};
+  }
+}
+
+
+
+\tikzstyle{aS}=[every edge/.style={draw,->,>=stealth}]
+\tikzstyle{Asol}=[draw,circle,minimum size=5pt,inner sep=0,node distance=1.5cm]
+\tikzstyle{Aproc}=[draw,node distance=1.2cm]
+\tikzstyle{Aobj}=[node distance=1.5cm]
+\tikzstyle{Anos}=[font=\Large]
+
+%\tikzstyle{AprocPrio}=[Aproc,double]
+\tikzstyle{AsolPrio}=[Asol,double]
+\tikzstyle{AprocPrio}=[Aproc,double]
+\tikzstyle{aSPrio}=[aS,double]
+
+
+
+% Commandes À FAIRE
+%\usepackage{color} % Couleurs du texte
+%\newcommand{\todo}[1]{\textcolor{red}{\textbf{[[#1]]}}}
+%\newcommand{\TODO}{\todo{TODO}}
+
+
+% Id est
+%\newcommand{\ie}{\textit{i.e.} }
+\newcommand{\ie}{i.e.\ }
+\newcommand{\resp}{resp.\ }
+
+% Césures
+\hyphenation{pa-ra-me-tri-za-tion}
+\hyphenation{pa-ra-me-tri-za-tions}
+
+\title{Efficient analysis on very large models}
+
+\author{%
+Maxime Folschette
+\institute{LUNAM Universit\'e, \'Ecole Centrale de Nantes, IRCCyN UMR CNRS 6597\\
+(Institut de Recherche en Communications et Cybern\'etique de Nantes)\\
+1 rue de la No\"e -- B.P. 92101 -- 44321 Nantes Cedex 3, France.}
+\email{Maxime.Folschette@irccyn.ec-nantes.fr}
+\and
+Joint work with: 
+Lo\"ic Paulev\'e,
+Morgan Magnin,
+Olivier Roux
+}
+
+\def\titlerunning{Efficient analysis on very large models}
+\def\authorrunning{M. Folschette, L. Paulev\'e, M. Magnin, O. Roux}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The Process Hitting is a recently introduced framework to model concurrent processes.
+It models a finite set of components gathering several local states,
+with a particular form for the actions.
+In this paper, we define the reachability problem that aims at deciding if,
+starting from a given initial state, it is possible to activate a given local state.
+We also explain the static analysis method that was developed to answer to such problems
+in polynomial time, instead of exponential time, thus answering in hundredths of a second
+on models with hundreds of components,
+but at the price of being sometimes inconclusive.
+\end{abstract}
+
+
+
+\section{Introduction}
+
+%\todo{Ref PH: \cite{FPIMR12-CMSB}}
+
+Creating a coherent model from an existing system is a very challenging task,
+but analyzing may turn out to be even harder.
+%Above all problems met, the most important is
+%to be able to study it in the end, because it is its main finality.
+If we focus on discrete modeling, this kind of problems is recurrent.
+In biology, for example, it is rather common to build models
+using a series of local experiment in order to determine the interactions between
+several components of the system (genes, proteins, metabolites…).
+To achieve this, experimenters proceed to gene knockouts
+(that is, they prevent some genes to express and stop the production of the related protein)
+and then use microarrays to measure the concentration of each other proteins.
+%and thus the activity of all genes.
+The result of such \textit{in vivo} studies is a model that can gather up to hundreds of components,
+but several models of this kind can be also combined into a more general pathway,
+which can contain thousands of components.
+
+The problem of being able to efficiently study these models immediately raises.
+Formal model checkers usually have to compute the whole dynamics of the model
+in order to analyze and confront it to good properties,
+often expressed in temporal logics. %, such as in~\cite{Khalis09}.
+But the computing of a state graph (even partial) is of exponential complexity,
+thus preventing the application of these methods to large models.
+%---~that is, above 30 components.
+Some results allow to statically derive some results given the structure of the model.
+For example, the presence of some circuits in the regulations between genes
+%(\ie a circuit with an odd number of inhibitions)
+is a necessary condition for interesting behaviors such as oscillations~\cite{RiCo07}.
+%is a necessary condition for oscillations in the dynamics of the model~\cite{RiCo07,RRT08}.
+%Another approach consists in reducing the state graph \cite{Naldi09}
+Although such methods can be of interest, they do not allow precise analysis of the dynamics
+in order to validate the functionality of a model or predict \textit{in vivo} behaviors.
+
+In this paper we present an efficient method to compute a specific problem of reachability,
+that consists of checking if,
+%a given local state of a component can be activated from a
+%given initial state.
+starting for a given initial state of the system,
+a given component can reach a certain local state.
+This question is interesting to determine if, fore instance, given a configuration of inputs,
+a given output can be activated or not.
+The analysis we present here is applied to a specific restriction of synchronous automata networks,
+called Process Hitting~\cite{PMR10-TCSB}.
+The purpose of this formalism is to model a finite set of local levels,
+contained into a finite set of components;
+actions are used to change the local level of a component, and can be triggered by
+at most one other local level of another component.
+Although originally designed for large biological networks,
+this formalism is general enough to represent any discrete system.
+The particular form of its actions allows an efficient analysis of the
+dynamics~\cite{PMR12-MSCS,FPMR13-CS2Bio}
+that we present in the following,
+which permits to answer reachability questions in polynomial time.
+%abstract interpretation that avoids exponential that we present in the following.
+%the dynamics of a model can be under- and over-approximated in order to conclude
+%on a reachability question in polynomial time, thus avoiding any combinatorial explosion.
+The main drawback of this approach is the possibility to be inconclusive
+%(if both approximations fail to conclude),
+although this case did not occur on the tested examples.
+
+% In \pref{sec:ph} we define the Process Hitting formalism that will be used throughout this paper.
+% The reachability problem is defined in \pref{sec:reachability}, along with a general
+% presentation of the solving method.
+% \pref{sec:glc} defines the graphs of local causality that will be used in
+% the two theorems presented in \pref{sec:th}.
+% Finally, \pref{sec:examples} gives some benchmark results of the implementation of the method
+% presented here, and \pref{sec:conclusion} concludes this paper.
+
+
+
+\section{The Process Hitting formalism}
+\label{sec:ph}
+
+\subsection{Definition}
+
+\pref{def:PH} introduces the Process Hitting~(PH)~\cite{PMR10-TCSB}
+which allows to model
+%A Process Hitting (PH) (\pref{def:PH}) gathers 
+a finite number of local levels,
+called \emph{processes},
+grouped into a finite set of components, called \emph{sorts}.
+A process is noted $a_i$, where $a$ is the sort's name,
+and $i$ is the process identifier within the sort $a$.
+At any time, exactly one process of each sort is \emph{active},
+and the set of active processes is called a \emph{state}.
+
+The concurrent interactions between processes are defined by a set of \emph{actions}.
+Actions describe the replacement of a process by another of the same sort
+conditioned by the presence of at most one other process in the current state.
+An action is denoted by $\PHfrappe{a_i}{b_j}{b_k}$, which is read as
+``$a_i$ \emph{hits} $b_j$ to make it bounce to $b_k$'',
+where $a_i,b_j,b_k$ are processes of sorts $a$ and $b$,
+called respectively \emph{hitter}, \emph{target} and
+\emph{bounce} of the action.
+We also call a \emph{self-hit} any action whose hitter and target sorts are the same,
+that is, of the form: $\PHfrappe{a_i}{a_i}{a_k}$.
+
+\begin{definition}[Process Hitting]\label{def:PH}
+  A \emph{Process Hitting} is a triple $(\PHs,\PHl,\PHa)$:
+  \begin{itemize}
+    \item $\PHs = \{a,b,\dots\}$ is the finite set of \emph{sorts};
+    \item $\PHl = \prod_{a\in\PHs} \PHl_a$ is the set of states with
+      $\PHl_a = \{a_0,\dots,a_{l_a}\}$
+      the finite set of \emph{processes} of sort $a\in\Sigma$
+      and $l_a$ a positive integer, with $a\neq b\Rightarrow \PHl_a \cap \PHl_b = \emptyset$;
+    \item $\PHa = \{ \PHfrappe{a_i}{b_j}{b_k} \in \PHl_a \times \PHl_b^2 \mid
+      (a,b) \in \PHs^2 \wedge b_j\neq b_k \wedge a=b\Rightarrow a_i=b_j\}$
+      is the finite set of \emph{actions}.
+  \end{itemize}
+\end{definition}
+
+\noindent
+The set of all processes is noted: $\Proc = \{ a_i \in \PHl_a \mid a \in \PHs \}$.
+Given a state $s\in \PHl$, the process of sort $a\in\PHs$ present in $s$ is denoted by $\PHget{s}{a}$.
+An action $h=\PHfrappe{a_i}{b_j}{b_k} \in \PHa$ is \emph{playable} in $s$ if and only if
+$\PHget{s}{a}=a_i$ and $\PHget{s}{b} = b_j$.
+In such a case, $(s\play h)$ stands for the state resulting from the play of the action
+$h$ in $s$, with $\PHget{(s\play h)}{b} = b_k$ and
+$\forall c \in \PHs, c \neq b, \PHget{(s\play h)}{c} = \PHget{s}{c}$.
+A sequence of actions $\delta = (h_1, \ldots, h_\card{\delta})$ that are successively playable in $s$
+is called a \emph{scenario in $s$}, and we note:
+$(s \play \delta) = s \play h_1 \play \ldots \play h_\card{\delta}$.
+We denote by $\Sce(s)$ the set of scenarios in $s$.
+
+\begin{example*}
+\pref{fig:ph} represents a PH $(\PHs,\PHl,\PHa)$ with four sorts
+($\PHs = \{a, b, c, d\}$) and:
+$\PHl_a = \{a_0, a_1\}$,
+$\PHl_b = \{b_0, b_1, b_2\}$,
+$\PHl_c = \{c_0, c_1\}$ and
+$\PHl_{d} = \{d_0, d_1, d_2\}$.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[font=\scriptsize]
+\path[use as bounding box] (-1,-2.9) rectangle (7.8,3.2);
+\TSort{(0,0)}{a}{2}{l}
+\TSort{(3,0)}{b}{3}{l}
+\TSort{(6,0)}{d}{3}{r}
+\TSort{(2,-2)}{c}{2}{b}
+
+\THit{a_0}{}{c_0}{.north}{c_1}
+\THit{a_1}{}{b_1}{.west}{b_0}
+\THit{c_1}{bend left=20pt}{b_0}{.west}{b_1}
+\THit{b_1.south west}{->}{a_0}{.east}{a_1}
+\THit{b_0}{}{d_0}{.west}{d_1} 
+\THit{b_1}{}{d_1}{.west}{d_2} 
+\THit{d_1}{}{b_0}{.north east}{b_2}
+\THit{c_1}{bend right=80pt,distance=80pt}{d_1}{.east}{d_0}
+\THit{b_2}{distance=120pt,out=30,in=40}{d_0}{.east}{d_2}
+
+\path[bounce,bend left]
+\TBounce{d_0}{}{d_1}{.south}
+\TBounce{d_1}{}{d_2}{.south}
+\TBounce{c_0}{}{c_1}{.west}
+\TBounce{b_0}{}{b_1}{.south}
+\TBounce{d_1}{}{d_0}{.north}
+;
+\path[bounce,bend right]
+\TBounce{a_0}{}{a_1}{.south}
+\TBounce{b_0}{}{b_2}{.south}
+\TBounce{b_1}{}{b_0}{.north}
+\TBounce{d_0}{bend right=50pt,distance=40pt}{d_2}{.south}
+;
+\TState{a_1,b_0,c_0,d_1}
+\node[process] (d_2) at (d_2.center) {{\Large$*$}};
+
+\end{tikzpicture}
+\caption{\label{fig:ph}
+A PH model example with four sorts.
+Circles represent the processes, boxes represent the sorts,
+and the actions are drawn by pairs of arrows in solid and dotted lines.
+The grayed processes and the asterisk indicate
+an example of reachability problem $P(\PHetat{a_1,b_0,c_0,d_1}, d_2)$
+as explained in \pref{sec:reachability}.
+}
+\end{figure}
+\end{example*}
+
+
+
+\subsection{The reachability problem}
+\label{sec:reachability}
+
+%\subsection{Definition}
+
+%First we need to precisely define what “reachability” means in a PH model.
+In this paper, we focus on the \emph{reachability of a process}
+(\pref{def:reachability}),
+which corresponds to the question:
+“Is it possible, starting from a given initial state, to play a number of actions
+so that a given process is active in the resulting state?”
+
+\begin{definition}[Reachability question]
+\label{def:reachability}
+  If $\ctx \in \PHl$ is a state and $a_i \in \Proc$ is a process,
+  we note $\Pcai$ the \emph{reachability question}:
+  $\exists? \delta \in \Sce(s), \PHget{(\ctx \play \delta)}{a} = a_i$.
+\end{definition}
+
+In fact, this question can be extended in several manners that will not be tackled here.
+The original paper deals with the question of the
+\emph{successive reachability of a sequence of processes}~\cite{PMR12-MSCS},
+in which several processes are required to be active successively,
+which is useful, for example, to state that a component can oscillate.
+%, or
+%that a process $p_1$ can be reached \emph{even after} the activation of another process $p_2$.
+%However this question does not encompass \emph{strict} succession, meaning that
+%the $p_2$ could be activated before $p_1$ nonetheless.
+Another interesting question %that will not be covered here
+is the \emph{simultaneous reachability of several processes};
+the addition of priorities in the PH~\cite{FPMR13-CS2Bio},
+in addition to increasing the expressivity of the formalism,
+allows to easily answer this question.
+% This question cannot be tackled only with the static analysis developed here,
+% because the PH does not allow to consider simultaneity.
+% However, the addition of priorities in the PH,
+% besides increasing the expressivity of this formalism,
+% permits to answer such questions by using a special sort to represent the
+% simultaneous activation of several processes~\cite{FPMR13-CS2Bio}.
+Finally, we note that the static analysis developed in the following sections
+can also be to some extent generalized to more synchronous automata networks~\cite{PAK13-CAV}.
+
+
+
+\subsection{Overview of the solution}
+
+The method developed here relies on the approximation of the dynamics of a PH model,
+instead of computing the exact dynamics which requires an exponential time and memory usage
+in the size of the model.
+Thus, the static analysis we propose
+only focuses on local dynamics of the model, that is to say, only computes the dynamics of
+single sorts each time it is necessary.
+This approximation is based on the fact that an action $\PHfrappe{a_i}{b_j}{b_k}$
+can only be triggered by (at most) a process $a_i$ of another sort (in the case where $a_i \neq b_j$).
+For example, solving $P(\ctx, b_k)$ would simply require to recursively solve $P(\ctx, a_i)$
+if $\PHget{\ctx}{b} = {b_j}$.
+In the general case, several actions are needed but the idea is the same.
+%which simply multiplies the new reachability questions.
+%as solving a reachability question may involve several actions,
+%the problem can be recursively solved by considering the reachability questions $P(\ctx, a_i)$
+%for all hitters $a_i$ involved in the solving.
+This drastically drops the complexity of the method % which now depends only on
+%the number of processes in each sort and the number of actions hitting them.
+%To be more precise, this method has
+to an almost polynomial complexity in the number of sorts in the whole model,
+allowing to answer reachability questions in less than a second
+on models with hundreds or thousands of sorts.
+
+However, an approximation does not come without drawbacks.
+Our method relies on two approximations:
+the \emph{under-approximation} $Q$ is a sufficient condition
+to answer “Yes” to the reachability question,
+and the \emph{over-approximation} $R$ is a necessary condition, used to answer “No”.
+Indeed, instead of directly checking a given reachability question $\Pcai$,
+we check $Q$ and $R$, which is easier as explained above,
+and use the fact that $Q \Rightarrow \Pcai \Rightarrow R$.
+But in the case where $Q$ is false and $R$ is true,
+the answer turns out to be “Inconclusive”,
+and classical model checking techniques have to be used.
+Nevertheless, our method has always been conclusive on the examples tested in~\cite{PMR12-MSCS}.
+
+
+
+\section{Graphs of local causality}
+\label{sec:glc}
+
+The approximations developed in~\cite{PMR12-MSCS,FPMR13-CS2Bio}
+rely on the construction of a graph called
+\emph{graph of local causality} (GLC),
+that permit to approximate the dynamics of a PH model.
+One graph is dedicated to the under-approximation, while the other focuses on the over-approximation.
+We present an intuitive definition of these graphs in the following,
+and illustrate it with the PH model of \pref{fig:ph} and
+the reachability question $P(\ctx, d_2)$ where $\ctx = \PHetat{a_1,b_0,c_0,d_1}$.
+%, by focusing on a reachability question $\Pcai$.
+
+\subsection{Nodes}
+
+GLCs contain process nodes, objective nodes and solution nodes as detailed below.
+
+\begin{itemize}
+  \item
+Process nodes (in $\Proc$) allow to state that the reachability of a given process is needed.
+\end{itemize}
+For example, for the reachability question $P(\ctx, d_2)$, the process $d_2$ will naturally be a node
+of the graph.
+
+\emph{Objectives} have the form: $\PHobj{b_j}{b_k}$, which stands for the reachability
+of $b_j$ from a state where $b_k$ is present;
+it is thereby a refinement of the process node $b_k$ that focuses
+on the reachability of a process inside a sort from a given initial process.
+We denote the set of all objectives as: $\Obj$.
+An objective of the form $\PHobj{b_j}{b_j}$ is called \emph{trivial}
+because no action is needed to solve is.
+\begin{itemize}
+\item
+Objective nodes (in $\Obj$) thus permit to name the source and destination processes of a local reachability.
+\end{itemize}
+For example, $\PHobj{d_1}{d_2}$ denotes the reachability of $d_2$ from
+the initial process of $d$ in $\ctx$, which is $d_1$.
+
+Solving an objective $\PHobj{b_j}{b_k}$
+implies to find a set of actions that locally solve it.
+This can be done by analyzing all bounces and targets of actions on the sort $b$.
+and computing the paths without loops that lead from $b_j$ to $b_k$.
+%(\ie find a set of actions that locally solve it),
+%one has to study the actions hitting processes of $b$.
+%Indeed, it is possible to locally solve such an objective by looking at the actions' bounces
+%on the sort $b$ and computing the paths without loops that lead from $b_j$ to $b_k$.
+Then, if a sequence of actions solving $\PHobj{b_j}{b_k}$ is found,
+we abstract it by extracting only the hitters of the actions
+because they are the only requirement to play the said actions.
+Such an abstracted set of hitters is called a \emph{solution},
+and we denote $\Sol = \powerset(\Proc)$ the set of solutions.
+A solution indeed abstracts a sequence of actions because only the hitters are kept
+and the order of the actions is forgotten (as sets are not ordered).
+The solution for trivial objectives,
+or objectives that require only self-hits, is the empty set.
+
+\begin{itemize}
+  \item 
+Solution nodes (in $\Sol$) are sets of processes that are required to locally solve an objective.
+\end{itemize}
+For example, $\{ c_1, b_2 \}$ and $\{ b_1 \}$ are the two minimal solutions of
+the objective $\PHobj{d_0}{d_2}$ in \pref{fig:ph}.
+
+\subsection{Edges}
+
+Edges in a GLC link the different nodes to their requirements.
+The GLC of the over-approximation is recursively build the following way:
+\begin{itemize}
+  \item A process node $b_k$ is linked to the objective of the form: $\PHobj{(\PHget{\ctx}{b})}{b_k}$;
+  \item An objective node is linked to all the minimal solutions that solve it;
+  \item A solution is linked to all the processes it contains.
+\end{itemize}
+If a solution is the empty set, then it obviously has no successor, which terminates the recursion.
+
+The under-approximation GLC is built in a similar fashion,
+but a process may be linked to several additional objective nodes, in order to become sufficient.
+Indeed, if two processes of a sort $b$, say, $b_j$ and $b_k$ are needed to solve
+two different objectives, %say $O_1$ and $O_2$,
+then we have to ensure that
+$b_j$ and $b_k$ are both reachable from the initial state process $\PHget{\ctx}{b}$,
+but also that $b_j$ is reachable from $b_k$ and $b_k$ is reachable from $b_j$.
+Thus, new objectives $\PHobj{b_j}{b_k}$ and $\PHobj{b_k}{b_j}$ are added,
+and this step is executed iteratively until a fixed point is reached.
+
+\begin{comment}
+In order to build the GLC of the under-approximation,
+we need to extend the notion of initial state $\ctx$ to a more general notion of \emph{context},
+in which each sort can contain several (initially) active processes.
+This allows to iteratively \emph{complete} this initial context
+with all the process nodes contained in the graph.
+In other words, this GLC is computed several times (until a fixed point is reached)
+by adding in the initial context all the processes that are potentially new source processes
+for each objective.
+Indeed, if two processes of a sort $b$, say, $b_j$ and $b_k$ are needed to solve
+two different objectives, %say $O_1$ and $O_2$,
+then one has to ensure that
+$b_j$ and $b_k$ are both reachable from the initial state process $\PHget{\ctx}{b}$,
+but also that $b_j$ is reachable from $b_k$ and $b_k$ is reachable from $b_j$.
+Thus, new objectives $\PHobj{b_j}{b_k}$ and $\PHobj{b_k}{b_j}$ are required,
+which is expressed by adding $b_j$ and $b_k$ to the initial context.
+Finally, the under-approximation GLC is built the same way
+than the over-approximation one, but a process may be linked to several objective nodes,
+and the initial context is iteratively expanded as explained.
+\end{comment}
+
+We note that the complexity of building these graphs if polynomial in the number of sorts
+and exponential in the number of processes in each sort visited
+(due to the local solving of objectives in order to find solutions).
+However, if the model comprises few processes in every sort
+(\ie less that four, which is usual in biological models),
+then our method can be considered almost polynomial in the number of sorts, which is very efficient.
+
+\begin{example*}
+  \pref{fig:glc} gives two examples of GLCs,
+  one for the over-approximation (top) and
+  another for the under-approximation (bottom),
+  both computed for two different reachability questions on the PH model of \pref{fig:ph}.
+
+\begin{figure}[ht]
+
+\begin{tikzpicture}[aS,node distance=1.25cm]
+%\path[draw,use as bounding box] (-0.5,-2.1) rectangle (10.25,1.15);
+
+\node[Aobj] (d12) {$\PHobj{d_1}{d_2}$};
+\node[Aproc, above of=d12] (d2) {$d_2$};
+
+\node[Asol,above right of=d12,yshift=-0.4cm] (d12s1) {};
+\node[Aproc, right of=d12s1,xshift=1cm] (b2) {$b_2$};
+\node[Aobj,right of=b2] (b02) {$\PHobj{b_0}{b_2}$};
+\node[Asol,right of=b02] (b02s) {};
+\node[Aproc,right of=b02s] (d1) {$d_1$};
+\node[Aobj,right of=d1] (d11) {$\PHobj{d_1}{d_1}$};
+\node[Asol,right of=d11] (d11s) {};
+
+\node[Asol,below right of=d12,yshift=0.4cm] (d12s2) {};
+\node[Aproc, right of=d12s2] (b1) {$b_1$};
+\node[Aobj,right of=b1] (b01) {$\PHobj{b_0}{b_1}$};
+\node[Asol,right of=b01] (b01s) {};
+\node[Aproc,right of=b01s] (c1) {$c_1$};
+\node[Aobj,right of=c1] (c01) {$\PHobj{c_0}{c_1}$};
+\node[Asol,right of=c01] (c01s) {};
+\node[Aproc,right of=c01s] (a0) {$a_0$};
+\node[Aobj,right of=a0] (a10) {$\PHobj{a_1}{a_0}$};
+\node[xshift=.3cm] at (a10.east) {($\bot$)};
+
+\path
+(d12) edge (d12s1) edge (d12s2) (d12s1) edge (b2) edge (c1) (d12s2) edge (b1)
+(b01) edge (b01s) (b01s) edge (c1)
+(b02) edge (b02s) (b02s) edge (d1)
+(c01) edge (c01s) (c01s) edge (a0)
+(d11) edge (d11s)
+(a0) edge (a10)
+(b1) edge (b01)
+(b2) edge (b02)
+(c1) edge (c01)
+(d1) edge (d11)
+(d2) edge (d12)
+;
+\end{tikzpicture}
+
+\vspace*{-.5em}
+
+\hrulefill
+
+\vspace*{.5em}
+
+\begin{tikzpicture}[aS,node distance=1.2cm]
+
+\node[Aobj] (d02) {$\PHobj{d_0}{d_2}$};
+\node[Aproc,above of=d02] (d2) {$d_2$};
+
+\node[Asol,right of=d02] (d02s2) {};
+\node[Aproc,above right of=d02s2,yshift=-0.2cm] (b0) {$b_0$};
+\node[Aobj,right of=b0] (b10) {$\PHobj{b_1}{b_0}$};
+\node[Asol,right of=b10] (b10s) {};
+\node[Aproc,right of=b10s] (a1) {$a_1$};
+\node[Aobj,right of=a1] (a11) {$\PHobj{a_1}{a_1}$};
+\node[Asol,right of=a11] (a11s) {};
+
+\node[Aobj,above of=b10,yshift=-0.6cm] (b00) {$\PHobj{b_0}{b_0}$};
+\node[Asol,right of=b00] (b00s) {};
+
+\node[Aproc, below of=b0,yshift=0.2cm] (b1) {$b_1$};
+\node[Aobj,right of=b1] (b11) {$\PHobj{b_1}{b_1}$};
+\node[Asol,right of=b11] (b11s) {};
+\node[Aobj,below of=b11,yshift=0.6cm] (b01) {$\PHobj{b_0}{b_1}$};
+\node[Asol,right of=b01] (b01s) {};
+\node[Aproc,right of=b01s] (c1) {$c_1$};
+\node[Aobj,right of=c1] (c11) {$\PHobj{c_1}{c_1}$};
+\node[Asol,right of=c11] (c11s) {};
+
+\path
+(d02) edge (d02s2) (d02s2) edge (b1) edge (b0)
+(a11) edge (a11s)
+(b10) edge (b10s) (b10s) edge (a1)
+(b11) edge (b11s)
+(a1) edge (a11)
+(b0) edge (b10) edge (b00.west) (b1) edge (b11)
+(d2) edge (d02)
+(b00) edge (b00s)
+;
+\path
+(b01) edge (b01s) (b01s) edge (c1)
+(c11) edge (c11s)
+(b1) edge (b01.west)
+(c1) edge (c11)
+;
+\end{tikzpicture}
+
+\caption{\label{fig:glc}
+(top) Over-approximation GLC computed for the PH of \pref{fig:ph}
+for $P(\PHetat{a_1,b_0,c_0,d_1}, d_2)$.
+(bottom) Under-approximation GLC computed for the PH of \pref{fig:ph}
+for $P(\PHetat{a_1,b_1,c_1,d_0}, d_2)$.
+}
+\end{figure}
+\end{example*}
+
+
+
+\section{Necessary and sufficient conditions}
+\label{sec:th}
+
+Finally, the two computed GLCs can be used in order to conclude on the initial reachability question
+$\Pcai$ (\pref{th:oa} and \pref{th:ua}).
+Checking these theorems is of polynomial complexity in the number of nodes they contain,
+which is limited by the size of the model.
+
+\begin{theorem}[Over-approximation]
+\label{th:oa}
+  If, starting from the process $a_i$ in the over-approximation GLC,
+  there exists no path with no loop such that,
+  from an objective node, exactly one linked solution node is traversed
+  and, from any other node, all linked nodes are traversed,
+  then $\Pcai$ is false.
+\end{theorem}
+
+\begin{theorem}[Under-approximation]
+\label{th:ua}
+  If the under-approximation GLC has no cycle and all its leaves are solution nodes,
+  then $\Pcai$ is true.
+\end{theorem}
+
+\begin{example*}
+  By applying \pref{th:oa} on \pref{fig:glc}(top),
+  we can conclude that $P(\PHetat{a_1,b_0,c_0,d_1}, d_2)$ is wrong
+  because all paths lead to $\PHobj{a_1}{a_0}$ which has no solution.
+  Conversely, with \pref{th:ua} we can conclude that
+  $P(\PHetat{a_1,b_1,c_1,d_0}, d_2)$ is true
+  because all leafs of on \pref{fig:glc}(bottom) are solutions.
+\end{example*}
+
+
+
+
+\section{Application to large models}
+\label{sec:examples}
+
+The method presented here was implemented into the
+Pint\footnote{The source of Pint and the examples mentioned below are available at
+\url{http://loicpauleve.name/pint/}}
+library which gathers tools dedicated to PH, and
+applied on four biological models as detailed in~\cite{PMR12-MSCS}.
+In a nutshell, all models studied have between 42 and 193 sorts,
+amongst them what we call \emph{inputs} (\resp \emph{outputs}),
+that is, sorts whose processes are not the target (\resp the hitter) of any actions.
+For all the possible combinations of the inputs
+(that can be either “active” or “inactive”)
+the reachability of an “active” state for each output was computed.
+
+The implementation could answer in less than a tenth of a second for each
+reachability question.
+These computation times were compared to the classical model checkers Biocham~\cite{fages2008formal}
+and libDDD~\cite{couvreur2002data}, for which the solving of the same reachability questions
+took at least 1 second and in many cases did not terminate due to lack of memory.
+Furthermore, our method was always conclusive,
+that is, \pref{th:oa} or \pref{th:ua} could always be used in order to conclude,
+thus leading to no inconclusive analysis.
+Theses examples prove that the approximations developed in the previous sections are very efficient
+and allow an unprecedented study of very large models.
+
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We summarized in this paper the static analysis developed in~\cite{PMR12-MSCS}
+and later extended in~\cite{FPMR13-CS2Bio}.
+This analysis is applicable to a class of models called Process Hitting that is a
+restriction of synchronous automata networks,
+and aims at determining if a local state of a component in the model can be attained from a given
+initial state.
+It consists in approximating the dynamics of the whole model by considering local
+reachabilities (objectives)
+and sets of local state requirements (solutions) to solve them.
+It turns out to be very efficient by making tractable the study of models
+with up to hundreds of components,
+while classical model checkers take much more time of fail due to memory limitations.
+
+
+
+%\bibliographystyle{ieeetr}
+%\bibliography{biblio}
+
+\begin{thebibliography}{1}
+
+\bibitem{RiCo07}
+A.~Richard and J.-P. Comet, ``Necessary conditions for multistationarity in
+  discrete dynamical systems,'' {\em Discrete Applied Mathematics}, vol.~155,
+  no.~18, pp.~2403 -- 2413, 2007.
+
+\bibitem{PMR10-TCSB}
+L.~{P}aulev{\'e}, M.~{M}agnin, and O.~{R}oux, ``Refining dynamics of gene
+  regulatory networks in a stochastic $\pi$-calculus framework,'' in {\em
+  Transactions on Computational Systems Biology XIII}, pp.~171--191, Springer,
+  2011.
+
+\bibitem{PMR12-MSCS}
+L.~Paulev\'{e}, M.~Magnin, and O.~Roux, ``Static analysis of biological
+  regulatory networks dynamics using abstract interpretation,'' {\em
+  Mathematical Structures in Computer Science}, vol.~22, no.~04, pp.~651--685,
+  2012.
+
+\bibitem{FPMR13-CS2Bio}
+M.~Folschette, L.~Paulev{\'e}, M.~Magnin, and O.~Roux, ``Under-approximation of
+  reachability in multivalued asynchronous networks,'' {\em Electronic Notes in
+  Theoretical Computer Science}, vol.~299, pp.~33 -- 51, 2013.
+\newblock 4th International Workshop on Interactions between Computer Science
+  and Biology (CS2Bio'13).
+
+\bibitem{PAK13-CAV}
+L.~Paulev{\'e}, G.~Andrieux, and H.~Koeppl, ``Under-approximating cut sets for
+  reachability in large scale automata networks,'' in {\em Computer Aided
+  Verification} (N.~Sharygina and H.~Veith, eds.), vol.~8044 of {\em Lecture
+  Notes in Computer Science}, pp.~69--84, Springer Berlin Heidelberg, 2013.
+
+\bibitem{fages2008formal}
+F.~Fages and S.~Soliman, ``Formal cell biology in {B}iocham,'' in {\em Formal
+  Methods for Computational Systems Biology}, pp.~54--80, Springer, 2008.
+
+\bibitem{couvreur2002data}
+J.-M. Couvreur, E.~Encrenaz, E.~Paviot-Adet, D.~Poitrenaud, and P.-A.
+  Wacrenier, ``Data decision diagrams for {P}etri net analysis,'' in {\em
+  Application and Theory of Petri Nets 2002}, vol.~2360 of {\em Lecture Notes
+  in Computer Science}, pp.~101--120, Springer, 2002.
+
+\end{thebibliography}
+
+\end{document}
