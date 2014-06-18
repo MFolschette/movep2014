@@ -325,8 +325,8 @@ font=\footnotesize,inner sep=1pt]
 \author{%
 Maxime Folschette
 \institute{LUNAM Universit\'e, \'Ecole Centrale de Nantes, IRCCyN UMR CNRS 6597\\
-(Institut de Recherche en Communications et Cybern\'etique de Nantes)\\
-1 rue de la No\"e -- B.P. 92101 -- 44321 Nantes Cedex 3, France.}
+(Institut de Recherche en Communications et Cybern\'etique de Nantes),\\
+1 rue de la No\"e, 44321 Nantes, France.}
 \email{Maxime.Folschette@irccyn.ec-nantes.fr}
 \and
 Joint work with: 
@@ -347,9 +347,11 @@ The Process Hitting is a recently introduced framework to model concurrent proce
 It models a finite set of components gathering several local states,
 with a particular form for the actions.
 In this paper, we define the reachability problem that aims at deciding if,
-starting from a given initial state, it is possible to activate a given local state.
+starting from a given initial state, it is possible to reach a given local state.
 We also explain the static analysis method that was developed to answer to such problems
-in polynomial time, instead of exponential time, thus answering in hundredths of a second
+in polynomial time, instead of the exponential complexity
+of the usual model checkers that apply a brute force approach.
+Our method thus answers in hundredths of a second
 on models with hundreds of components,
 but at the price of being sometimes inconclusive.
 \end{abstract}
@@ -376,7 +378,7 @@ The result of such \textit{in vivo} studies is a model that can gather up to hun
 but several models of this kind can be also combined into a more general pathway,
 which can contain thousands of components.
 
-The problem of being able to efficiently study these models immediately raises.
+The problem of being able to efficiently study these models immediately emerges.
 Formal model checkers usually have to compute the whole dynamics of the model
 in order to analyze and confront it to good properties,
 often expressed in temporal logics. %, such as in~\cite{Khalis09}.
@@ -396,9 +398,9 @@ In this paper we present an efficient method to compute a specific problem of re
 that consists of checking if,
 %a given local state of a component can be activated from a
 %given initial state.
-starting for a given initial state of the system,
+starting from a given initial state of the system,
 a given component can reach a certain local state.
-This question is interesting to determine if, fore instance, given a configuration of inputs,
+This question is interesting to determine if, for instance, given a configuration of inputs,
 a given output can be activated or not.
 The analysis we present here is applied to a specific restriction of synchronous automata networks,
 called Process Hitting~\cite{PMR10-TCSB}.
@@ -440,7 +442,7 @@ which allows to model
 a finite number of local levels,
 called \emph{processes},
 grouped into a finite set of components, called \emph{sorts}.
-A process is noted $a_i$, where $a$ is the sort's name,
+A process is written $a_i$, where $a$ is the sort's name,
 and $i$ is the process identifier within the sort $a$.
 At any time, exactly one process of each sort is \emph{active},
 and the set of active processes is called a \emph{state}.
@@ -464,7 +466,7 @@ that is, of the form: $\PHfrappe{a_i}{a_i}{a_k}$.
       $\PHl_a = \{a_0,\dots,a_{l_a}\}$
       the finite set of \emph{processes} of sort $a\in\Sigma$
       and $l_a$ a positive integer, with $a\neq b\Rightarrow \PHl_a \cap \PHl_b = \emptyset$;
-    \item $\PHa = \{ \PHfrappe{a_i}{b_j}{b_k} \in \PHl_a \times \PHl_b^2 \mid
+    \item $\PHa \subseteq \{ \PHfrappe{a_i}{b_j}{b_k} \in \PHl_a \times \PHl_b^2 \mid
       (a,b) \in \PHs^2 \wedge b_j\neq b_k \wedge a=b\Rightarrow a_i=b_j\}$
       is the finite set of \emph{actions}.
   \end{itemize}
@@ -556,7 +558,11 @@ so that a given process is active in the resulting state?”
 \label{def:reachability}
   If $\ctx \in \PHl$ is a state and $a_i \in \Proc$ is a process,
   we note $\Pcai$ the \emph{reachability question}:
-  $\exists? \delta \in \Sce(s), \PHget{(\ctx \play \delta)}{a} = a_i$.
+  “Is there a scenario in $\ctx$ so that,
+  if we play all the actions of this scenario starting from $\ctx$,
+  $a_i$ is active in the resulting state?”;
+  that is, in formal terms:
+  \[\Pcai \equiv \exists? \delta \in \Sce(\ctx), \PHget{(\ctx \play \delta)}{a} = a_i \enspace.\]
 \end{definition}
 
 In fact, this question can be extended in several manners that will not be tackled here.
@@ -587,7 +593,7 @@ can also be to some extent generalized to more synchronous automata networks~\ci
 \subsection{Overview of the solution}
 
 The method developed here relies on the approximation of the dynamics of a PH model,
-instead of computing the exact dynamics which requires an exponential time and memory usage
+instead of computing the exact dynamics, which requires an exponential time and memory usage
 in the size of the model.
 Thus, the static analysis we propose
 only focuses on local dynamics of the model, that is to say, only computes the dynamics of
@@ -627,9 +633,9 @@ Nevertheless, our method has always been conclusive on the examples tested in~\c
 \label{sec:glc}
 
 The approximations developed in~\cite{PMR12-MSCS,FPMR13-CS2Bio}
-rely on the construction of a graph called
-\emph{graph of local causality} (GLC),
-that permit to approximate the dynamics of a PH model.
+rely on the construction of graphs called
+\emph{graphs of local causality} (GLCs),
+that permit approximating the dynamics of a PH model.
 One graph is dedicated to the under-approximation, while the other focuses on the over-approximation.
 We present an intuitive definition of these graphs in the following,
 and illustrate it with the PH model of \pref{fig:ph} and
@@ -648,10 +654,11 @@ For example, for the reachability question $P(\ctx, d_2)$, the process $d_2$ wil
 of the graph.
 
 \emph{Objectives} have the form: $\PHobj{b_j}{b_k}$, which stands for the reachability
-of $b_j$ from a state where $b_k$ is present;
-it is thereby a refinement of the process node $b_k$ that focuses
+of $b_k$ from a state where $b_j$ is present;
+it is thereby a refinement of a possible process node $b_k$ in the GLC, by focusing
 on the reachability of a process inside a sort from a given initial process.
-We denote the set of all objectives as: $\Obj$.
+We denote the set of all possible objectives as
+$\Obj = \{ \PHobj{b_j}{b_k} \in \PHl_b \times \PHl_b \mid b \in \PHs \}$.
 An objective of the form $\PHobj{b_j}{b_j}$ is called \emph{trivial}
 because no action is needed to solve is.
 \begin{itemize}
@@ -662,7 +669,7 @@ For example, $\PHobj{d_1}{d_2}$ denotes the reachability of $d_2$ from
 the initial process of $d$ in $\ctx$, which is $d_1$.
 
 Solving an objective $\PHobj{b_j}{b_k}$
-implies to find a set of actions that locally solve it.
+implies to find a set of actions that locally solves it.
 This can be done by analyzing all bounces and targets of actions on the sort $b$.
 and computing the paths without loops that lead from $b_j$ to $b_k$.
 %(\ie find a set of actions that locally solve it),
@@ -673,7 +680,7 @@ Then, if a sequence of actions solving $\PHobj{b_j}{b_k}$ is found,
 we abstract it by extracting only the hitters of the actions
 because they are the only requirement to play the said actions.
 Such an abstracted set of hitters is called a \emph{solution},
-and we denote $\Sol = \powerset(\Proc)$ the set of solutions.
+and we denote $\Sol = \powerset(\Proc)$ the set of all possible solutions.
 A solution indeed abstracts a sequence of actions because only the hitters are kept
 and the order of the actions is forgotten (as sets are not ordered).
 The solution for trivial objectives,
@@ -684,12 +691,12 @@ or objectives that require only self-hits, is the empty set.
 Solution nodes (in $\Sol$) are sets of processes that are required to locally solve an objective.
 \end{itemize}
 For example, $\{ c_1, b_2 \}$ and $\{ b_1 \}$ are the two minimal solutions of
-the objective $\PHobj{d_0}{d_2}$ in \pref{fig:ph}.
+the objective $\PHobj{d_1}{d_2}$ in \pref{fig:ph}.
 
 \subsection{Edges}
 
 Edges in a GLC link the different nodes to their requirements.
-The GLC of the over-approximation is recursively build the following way:
+The GLC of the over-approximation is recursively built the following way:
 \begin{itemize}
   \item A process node $b_k$ is linked to the objective of the form: $\PHobj{(\PHget{\ctx}{b})}{b_k}$;
   \item An objective node is linked to all the minimal solutions that solve it;
@@ -704,8 +711,8 @@ two different objectives, %say $O_1$ and $O_2$,
 then we have to ensure that
 $b_j$ and $b_k$ are both reachable from the initial state process $\PHget{\ctx}{b}$,
 but also that $b_j$ is reachable from $b_k$ and $b_k$ is reachable from $b_j$.
-Thus, new objectives $\PHobj{b_j}{b_k}$ and $\PHobj{b_k}{b_j}$ are added,
-and this step is executed iteratively until a fixed point is reached.
+Thus, new objectives $\PHobj{b_j}{b_k}$ and $\PHobj{b_k}{b_j}$ are added.
+This step is executed iteratively until a fixed point is reached.
 
 \begin{comment}
 In order to build the GLC of the under-approximation,
@@ -728,12 +735,13 @@ than the over-approximation one, but a process may be linked to several objectiv
 and the initial context is iteratively expanded as explained.
 \end{comment}
 
-We note that the complexity of building these graphs if polynomial in the number of sorts
+We note that the complexity of building these graphs is polynomial in the number of sorts
 and exponential in the number of processes in each sort visited
 (due to the local solving of objectives in order to find solutions).
 However, if the model comprises few processes in every sort
 (\ie less that four, which is usual in biological models),
-then our method can be considered almost polynomial in the number of sorts, which is very efficient.
+then our method can be considered almost polynomial in the number of sorts, which is very efficient
+compared to other solutions.
 
 \begin{example*}
   \pref{fig:glc} gives two examples of GLCs,
@@ -882,7 +890,7 @@ which is limited by the size of the model.
 \label{sec:examples}
 
 The method presented here was implemented into the
-Pint\footnote{The source of Pint and the examples mentioned below are available at
+Pint\footnote{The source of Pint and the examples mentioned here are available at:
 \url{http://loicpauleve.name/pint/}}
 library which gathers tools dedicated to PH, and
 applied on four biological models as detailed in~\cite{PMR12-MSCS}.
